@@ -3,6 +3,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
     <PackageReference Include="Serilog.AspNetCore" />
+    <PackageReference Include="Serilog.Formatting.Compact" />
     <PackageReference Include="Serilog.Sinks.Console" />
     <PackageReference Include="Swashbuckle.AspNetCore" />
   </ItemGroup>
