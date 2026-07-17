@@ -2,6 +2,10 @@
 
 Production-oriented .NET 9 modular-monolith backend using Clean Architecture.
 
+## Architecture overview
+
+![Car Rental Platform architecture overview](docs/architecture/car-rental-platform-overview.png)
+
 ## Projects
 
 - `CarRental.API`: REST host and composition root.
