@@ -59,3 +59,25 @@ For local development, copy `local.settings.example.json` to `local.settings.jso
 source control. Malformed messages, missing customer recipients, and permanent SendGrid rejections are explicitly
 dead-lettered. Transient failures are thrown for Service Bus redelivery. The SQL inbox prevents repeat sends for
 messages already marked completed and coordinates concurrent scaled-out workers.
+
+## Reporting Function
+
+`CarRental.Reporting.Function` is a .NET 9 isolated Timer-trigger worker. By default it runs daily at
+02:00 UTC, generates the previous UTC day's rental reports, uploads PDFs to a private Blob container,
+stores ownership/blob metadata in Azure SQL, and publishes `ReportGeneratedIntegrationEvent`.
+
+Before deployment:
+
+1. Apply [`deploy/sql/reporting.sql`](deploy/sql/reporting.sql) and add active rows to
+   `[reporting].[ReportSubscriptions]`. A nullable `CustomerId` scopes customer reports; a null value is
+   intended only for authorized administrative summaries.
+2. Assign the Function managed identity `Storage Blob Data Contributor`, `Azure Service Bus Data Sender`,
+   and the required Azure SQL permissions.
+3. Configure `ReportingSchedule`, `ConnectionStrings__CarRentalDatabase`, `BlobStorage__ServiceUri`,
+   `BlobStorage__ContainerName`, `AzureServiceBus__FullyQualifiedNamespace`, and
+   `AzureServiceBus__TopicName` as Function App settings or Key Vault references.
+
+The Blob container is created with `PublicAccessType.None`. Events contain the authenticated API path
+`/api/reports/{id}/download`; they never expose a Blob URL. Period uniqueness prevents duplicate reports,
+and an unpublished metadata record is resumed on the next Timer retry. A visually verified sample is at
+[`output/pdf/daily-rental-report-sample.pdf`](output/pdf/daily-rental-report-sample.pdf).

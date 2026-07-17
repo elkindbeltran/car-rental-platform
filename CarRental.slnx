@@ -5,6 +5,7 @@
     <Project Path="src/CarRental.Domain/CarRental.Domain.csproj" />
     <Project Path="src/CarRental.Infrastructure/CarRental.Infrastructure.csproj" />
     <Project Path="src/CarRental.Notification.Function/CarRental.Notification.Function.csproj" />
+    <Project Path="src/CarRental.Reporting.Function/CarRental.Reporting.Function.csproj" />
     <Project Path="src/CarRental.SharedKernel/CarRental.SharedKernel.csproj" />
   </Folder>
 </Solution>

@@ -1,0 +1,13 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+    "ReportingSchedule": "0 0 2 * * *",
+    "ConnectionStrings__CarRentalDatabase": "Server=(localdb)\\MSSQLLocalDB;Database=CarRental;Trusted_Connection=True;TrustServerCertificate=True",
+    "BlobStorage__ServiceUri": "https://replace.blob.core.windows.net",
+    "BlobStorage__ContainerName": "rental-reports",
+    "AzureServiceBus__FullyQualifiedNamespace": "replace-with-your-namespace.servicebus.windows.net",
+    "AzureServiceBus__TopicName": "car-rental-events"
+  }
+}
