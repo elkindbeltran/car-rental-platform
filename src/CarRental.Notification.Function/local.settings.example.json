@@ -1,0 +1,14 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+    "ServiceBusConnection__fullyQualifiedNamespace": "replace-with-your-namespace.servicebus.windows.net",
+    "NotificationsTopicName": "car-rental-events",
+    "NotificationsSubscriptionName": "notifications",
+    "ConnectionStrings__CarRentalDatabase": "Server=(localdb)\\MSSQLLocalDB;Database=CarRental;Trusted_Connection=True;TrustServerCertificate=True",
+    "SendGrid__ApiKey": "replace-with-user-secret-or-environment-setting",
+    "SendGrid__FromEmail": "notifications@example.com",
+    "SendGrid__FromName": "Car Rental"
+  }
+}

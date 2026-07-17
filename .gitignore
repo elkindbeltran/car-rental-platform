@@ -7,4 +7,5 @@
 *.user
 *.suo
 appsettings.Local.json
+local.settings.json
 TestResults/

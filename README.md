@@ -37,3 +37,25 @@ dotnet run --project src/CarRental.API
 ```
 
 Health endpoints are available at `/alive` (process liveness) and `/health` (dependency readiness). Swagger UI is enabled only in Development.
+
+## Notification Function
+
+`CarRental.Notification.Function` is a .NET 9 isolated Azure Functions worker. It consumes the
+`BookingCreatedIntegrationEvent` from the configured Service Bus topic/subscription and sends booking
+confirmation email through SendGrid.
+
+Before deployment:
+
+1. Apply [`deploy/sql/notification-inbox.sql`](deploy/sql/notification-inbox.sql) to the Car Rental database.
+2. Create the `notifications` subscription on the `car-rental-events` topic and configure an appropriate
+   `MaxDeliveryCount` (for example, 10). Azure Service Bus automatically moves exhausted transient deliveries
+   to the subscription's dead-letter queue.
+3. Assign the Function managed identity `Azure Service Bus Data Receiver` and the required Azure SQL role.
+4. Configure `ServiceBusConnection__fullyQualifiedNamespace`, `NotificationsTopicName`,
+   `NotificationsSubscriptionName`, `ConnectionStrings__CarRentalDatabase`, `SendGrid__ApiKey`,
+   `SendGrid__FromEmail`, and `SendGrid__FromName` as Function App settings or Key Vault references.
+
+For local development, copy `local.settings.example.json` to `local.settings.json` and supply secrets outside
+source control. Malformed messages, missing customer recipients, and permanent SendGrid rejections are explicitly
+dead-lettered. Transient failures are thrown for Service Bus redelivery. The SQL inbox prevents repeat sends for
+messages already marked completed and coordinates concurrent scaled-out workers.
