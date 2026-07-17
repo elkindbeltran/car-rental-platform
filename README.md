@@ -23,11 +23,16 @@ Auth0__RoleClaimType
 ConnectionStrings__CarRentalDatabase
 AzureServiceBus__FullyQualifiedNamespace
 AzureServiceBus__TopicName
+BlobStorage__ServiceUri
 ```
 
 Azure Service Bus uses `DefaultAzureCredential`. In Azure, assign the API's managed identity the
 `Azure Service Bus Data Sender` role on the configured namespace. Local development can authenticate
 with the Azure CLI or a supported developer credential; no Service Bus connection string is stored.
+
+Report downloads also use `DefaultAzureCredential`. Assign the API managed identity
+`Storage Blob Data Contributor` on the storage account so it can request user-delegation keys and read report blobs. The API
+creates HTTPS-only, read-only SAS URLs that expire after five minutes; storage account keys are not used.
 
 ## Run
 

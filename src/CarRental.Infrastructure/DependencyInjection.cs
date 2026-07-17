@@ -1,8 +1,11 @@
 using Azure.Identity;
 using Azure.Messaging.ServiceBus;
+using Azure.Storage.Blobs;
 using CarRental.Application.Abstractions.Messaging;
+using CarRental.Application.Reporting.DownloadReport;
 using CarRental.Infrastructure.Messaging;
 using CarRental.Infrastructure.Persistence;
+using CarRental.Infrastructure.Reporting;
 using CarRental.Infrastructure.Time;
 using CarRental.SharedKernel.Application;
 using Microsoft.EntityFrameworkCore;
@@ -30,10 +33,34 @@ public static class DependencyInjection
         services.AddScoped<IUnitOfWork>(serviceProvider =>
             serviceProvider.GetRequiredService<ApplicationDbContext>());
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
+        services.AddReportDownloads(configuration);
         services.AddAzureServiceBus(configuration);
         services.AddHealthChecks().AddDbContextCheck<ApplicationDbContext>("azure-sql");
 
         return services;
+    }
+
+    private static void AddReportDownloads(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        services.AddOptions<BlobStorageOptions>()
+            .Bind(configuration.GetSection(BlobStorageOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        services.AddSingleton(serviceProvider =>
+        {
+            var options = serviceProvider
+                .GetRequiredService<Microsoft.Extensions.Options.IOptions<BlobStorageOptions>>()
+                .Value;
+
+            return new BlobServiceClient(
+                new Uri(options.ServiceUri),
+                new DefaultAzureCredential());
+        });
+        services.AddScoped<IReportDownloadRepository, ReportDownloadRepository>();
+        services.AddSingleton<IReportDownloadLinkGenerator, UserDelegationSasLinkGenerator>();
     }
 
     private static void AddAzureServiceBus(
