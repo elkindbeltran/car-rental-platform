@@ -56,6 +56,19 @@ Apply Code First migrations with:
 dotnet ef database update --project src/CarRental.Infrastructure --startup-project src/CarRental.API
 ```
 
+## Tests
+
+- `CarRental.UnitTests` verifies Customer, Vehicle, and Booking aggregate invariants and lifecycle behavior.
+- `CarRental.IntegrationTests` hosts the real API pipeline with test authentication, an isolated EF Core store,
+  and no-op messaging. It verifies authorization, validation responses, persistence, uniqueness checks, module
+  dependencies, and overlapping-booking rejection without requiring Azure credentials.
+
+Run the complete suite with:
+
+```powershell
+dotnet test CarRental.slnx --configuration Release
+```
+
 ## Notification Function
 
 `CarRental.Notification.Function` is a .NET 9 isolated Azure Functions worker. It consumes the

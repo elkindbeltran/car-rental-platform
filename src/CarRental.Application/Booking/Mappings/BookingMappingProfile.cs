@@ -8,6 +8,6 @@ public sealed class BookingMappingProfile : Profile
     public BookingMappingProfile()
     {
         CreateMap<Domain.Booking.Booking, BookingResponse>()
-            .ForMember(destination => destination.Status, options => options.MapFrom(source => source.Status.ToString()));
+            .ForCtorParam(nameof(BookingResponse.Status), options => options.MapFrom(source => source.Status.ToString()));
     }
 }

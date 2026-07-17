@@ -8,4 +8,8 @@
     <Project Path="src/CarRental.Reporting.Function/CarRental.Reporting.Function.csproj" />
     <Project Path="src/CarRental.SharedKernel/CarRental.SharedKernel.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/CarRental.UnitTests/CarRental.UnitTests.csproj" />
+    <Project Path="tests/CarRental.IntegrationTests/CarRental.IntegrationTests.csproj" />
+  </Folder>
 </Solution>
