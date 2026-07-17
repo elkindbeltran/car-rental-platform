@@ -21,7 +21,13 @@ Auth0__Authority
 Auth0__Audience
 Auth0__RoleClaimType
 ConnectionStrings__CarRentalDatabase
+AzureServiceBus__FullyQualifiedNamespace
+AzureServiceBus__TopicName
 ```
+
+Azure Service Bus uses `DefaultAzureCredential`. In Azure, assign the API's managed identity the
+`Azure Service Bus Data Sender` role on the configured namespace. Local development can authenticate
+with the Azure CLI or a supported developer credential; no Service Bus connection string is stored.
 
 ## Run
 

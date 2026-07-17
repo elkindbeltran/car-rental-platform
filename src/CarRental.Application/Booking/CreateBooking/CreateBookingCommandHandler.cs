@@ -1,6 +1,7 @@
 using AutoMapper;
 using CarRental.Application.Abstractions.Messaging;
 using CarRental.Application.Booking.Abstractions;
+using CarRental.Application.Booking.IntegrationEvents;
 using CarRental.Domain.Booking;
 using CarRental.SharedKernel.Application;
 using CarRental.SharedKernel.Results;
@@ -13,6 +14,7 @@ internal sealed class CreateBookingCommandHandler(
     IVehicleBookingReader vehicleReader,
     IUnitOfWork unitOfWork,
     IDateTimeProvider dateTimeProvider,
+    IIntegrationEventPublisher eventPublisher,
     IMapper mapper) : ICommandHandler<CreateBookingCommand, Result<BookingResponse>>
 {
     public async Task<Result<BookingResponse>> Handle(
@@ -40,6 +42,7 @@ internal sealed class CreateBookingCommandHandler(
             return Result.Failure<BookingResponse>(BookingErrors.VehicleUnavailable);
         }
 
+        var occurredOnUtc = dateTimeProvider.UtcNow;
         var booking = Domain.Booking.Booking.Create(
             Guid.NewGuid(),
             request.CustomerId,
@@ -48,10 +51,23 @@ internal sealed class CreateBookingCommandHandler(
             request.ReturnAtUtc,
             request.DailyRate,
             request.Currency,
-            dateTimeProvider.UtcNow);
+            occurredOnUtc);
 
         bookingRepository.Add(booking);
         await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        await eventPublisher.PublishAsync(
+            new BookingCreatedIntegrationEvent(
+                Guid.NewGuid(),
+                occurredOnUtc,
+                booking.Id,
+                booking.CustomerId,
+                booking.VehicleId,
+                booking.PickupAtUtc,
+                booking.ReturnAtUtc,
+                booking.TotalAmount,
+                booking.Currency),
+            cancellationToken);
 
         return Result.Success(mapper.Map<BookingResponse>(booking));
     }
