@@ -2,7 +2,16 @@ using Azure.Identity;
 using Azure.Messaging.ServiceBus;
 using Azure.Storage.Blobs;
 using CarRental.Application.Abstractions.Messaging;
+using CarRental.Application.Booking.Abstractions;
+using CarRental.Application.Customer;
+using CarRental.Application.Inventory;
 using CarRental.Application.Reporting.DownloadReport;
+using CarRental.Domain.Customer;
+using CarRental.Domain.Booking;
+using CarRental.Domain.Inventory;
+using CarRental.Infrastructure.Booking;
+using CarRental.Infrastructure.Customer;
+using CarRental.Infrastructure.Inventory;
 using CarRental.Infrastructure.Messaging;
 using CarRental.Infrastructure.Persistence;
 using CarRental.Infrastructure.Reporting;
@@ -32,6 +41,15 @@ public static class DependencyInjection
 
         services.AddScoped<IUnitOfWork>(serviceProvider =>
             serviceProvider.GetRequiredService<ApplicationDbContext>());
+        services.AddScoped<IBookingRepository, BookingRepository>();
+        services.AddScoped<CustomerRepository>();
+        services.AddScoped<ICustomerRepository>(provider => provider.GetRequiredService<CustomerRepository>());
+        services.AddScoped<ICustomerBookingReader>(provider => provider.GetRequiredService<CustomerRepository>());
+        services.AddScoped<ICustomerReadService>(provider => provider.GetRequiredService<CustomerRepository>());
+        services.AddScoped<VehicleRepository>();
+        services.AddScoped<IVehicleRepository>(provider => provider.GetRequiredService<VehicleRepository>());
+        services.AddScoped<IVehicleBookingReader>(provider => provider.GetRequiredService<VehicleRepository>());
+        services.AddScoped<IVehicleReadService>(provider => provider.GetRequiredService<VehicleRepository>());
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
         services.AddReportDownloads(configuration);
         services.AddAzureServiceBus(configuration);

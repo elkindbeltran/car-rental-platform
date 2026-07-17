@@ -43,6 +43,19 @@ dotnet run --project src/CarRental.API
 
 Health endpoints are available at `/alive` (process liveness) and `/health` (dependency readiness). Swagger UI is enabled only in Development.
 
+## Core modules
+
+Customer management is exposed at `/api/customers` and requires the `Administrator` role. Vehicle inventory
+is exposed at `/api/vehicles`; authenticated users can read inventory while mutations require `Administrator`.
+Both modules use soft deletion and SQL row-version concurrency. Send the Base64 row version returned by detail
+responses on updates; deletes use the same value in the `If-Match` header.
+
+Apply Code First migrations with:
+
+```powershell
+dotnet ef database update --project src/CarRental.Infrastructure --startup-project src/CarRental.API
+```
+
 ## Notification Function
 
 `CarRental.Notification.Function` is a .NET 9 isolated Azure Functions worker. It consumes the

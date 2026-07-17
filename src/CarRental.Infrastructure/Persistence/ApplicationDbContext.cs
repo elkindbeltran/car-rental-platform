@@ -9,6 +9,10 @@ public sealed class ApplicationDbContext(
     IDateTimeProvider dateTimeProvider,
     ICurrentUserService currentUser) : DbContext(options), IUnitOfWork
 {
+    public DbSet<Domain.Customer.Customer> Customers => Set<Domain.Customer.Customer>();
+    public DbSet<Domain.Inventory.Vehicle> Vehicles => Set<Domain.Inventory.Vehicle>();
+    public DbSet<Domain.Booking.Booking> Bookings => Set<Domain.Booking.Booking>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
