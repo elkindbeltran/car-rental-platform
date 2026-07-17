@@ -1,6 +1,6 @@
 namespace CarRental.SharedKernel.Domain;
 
-public abstract class AggregateRoot<TId> : Entity<TId> where TId : notnull
+public abstract class AggregateRoot<TId> : BaseEntity<TId> where TId : notnull
 {
     private readonly List<IDomainEvent> _domainEvents = [];
 

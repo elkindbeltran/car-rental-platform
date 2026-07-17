@@ -25,7 +25,7 @@ public static class DependencyInjection
 
         services.AddScoped<IUnitOfWork>(serviceProvider =>
             serviceProvider.GetRequiredService<ApplicationDbContext>());
-        services.AddSingleton<IClock, SystemClock>();
+        services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
         services.AddHealthChecks().AddDbContextCheck<ApplicationDbContext>("azure-sql");
 
         return services;

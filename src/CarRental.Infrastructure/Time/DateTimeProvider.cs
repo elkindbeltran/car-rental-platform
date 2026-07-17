@@ -2,7 +2,7 @@ using CarRental.SharedKernel.Application;
 
 namespace CarRental.Infrastructure.Time;
 
-internal sealed class SystemClock : IClock
+internal sealed class DateTimeProvider : IDateTimeProvider
 {
     public DateTimeOffset UtcNow => DateTimeOffset.UtcNow;
 }

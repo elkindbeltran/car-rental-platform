@@ -1,4 +1,4 @@
-using FluentValidation;
+using CarRental.SharedKernel.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -29,6 +29,7 @@ internal sealed class GlobalExceptionHandler(
         var (status, title, detail) = exception switch
         {
             ValidationException => (StatusCodes.Status400BadRequest, "Validation failed", "One or more validation errors occurred."),
+            BusinessException businessError => (StatusCodes.Status422UnprocessableEntity, "Business rule violated", businessError.Message),
             DbUpdateConcurrencyException => (StatusCodes.Status409Conflict, "Concurrency conflict", "The resource was modified by another request. Reload it and retry."),
             _ => (StatusCodes.Status500InternalServerError, "Unexpected error", "An unexpected error occurred.")
         };
@@ -49,8 +50,12 @@ internal sealed class GlobalExceptionHandler(
         if (exception is ValidationException validationException)
         {
             problem.Extensions["errors"] = validationException.Errors
-                .GroupBy(error => error.PropertyName)
-                .ToDictionary(group => group.Key, group => group.Select(error => error.ErrorMessage).Distinct().ToArray());
+                .ToDictionary(error => error.Key, error => error.Value);
+        }
+
+        if (exception is BusinessException businessException)
+        {
+            problem.Extensions["code"] = businessException.Code;
         }
 
         return await problemDetailsService.TryWriteAsync(new ProblemDetailsContext

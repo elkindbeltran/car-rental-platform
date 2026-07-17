@@ -1,6 +1,6 @@
 namespace CarRental.SharedKernel.Application;
 
-public interface IClock
+public interface IDateTimeProvider
 {
     DateTimeOffset UtcNow { get; }
 }

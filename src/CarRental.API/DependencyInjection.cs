@@ -1,7 +1,7 @@
 using CarRental.API.Authentication;
 using CarRental.API.ErrorHandling;
 using CarRental.API.Options;
-using CarRental.Application.Abstractions.Authentication;
+using CarRental.SharedKernel.Application;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -18,7 +18,7 @@ public static class DependencyInjection
         services.AddProblemDetails();
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddHttpContextAccessor();
-        services.AddScoped<ICurrentUser, CurrentUser>();
+        services.AddScoped<ICurrentUserService, CurrentUser>();
 
         services.AddOptions<Auth0Options>()
             .Bind(configuration.GetSection(Auth0Options.SectionName))

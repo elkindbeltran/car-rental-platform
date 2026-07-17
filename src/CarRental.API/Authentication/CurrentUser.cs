@@ -1,9 +1,9 @@
 using System.Security.Claims;
-using CarRental.Application.Abstractions.Authentication;
+using CarRental.SharedKernel.Application;
 
 namespace CarRental.API.Authentication;
 
-internal sealed class CurrentUser(IHttpContextAccessor httpContextAccessor) : ICurrentUser
+internal sealed class CurrentUser(IHttpContextAccessor httpContextAccessor) : ICurrentUserService
 {
     private ClaimsPrincipal? Principal => httpContextAccessor.HttpContext?.User;
 

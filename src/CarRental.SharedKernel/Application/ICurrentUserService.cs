@@ -1,6 +1,6 @@
-namespace CarRental.Application.Abstractions.Authentication;
+namespace CarRental.SharedKernel.Application;
 
-public interface ICurrentUser
+public interface ICurrentUserService
 {
     string? UserId { get; }
     bool IsAuthenticated { get; }

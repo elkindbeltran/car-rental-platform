@@ -1,5 +1,6 @@
 using FluentValidation;
 using MediatR;
+using SharedValidationException = CarRental.SharedKernel.Exceptions.ValidationException;
 
 namespace CarRental.Application.Behaviors;
 
@@ -24,7 +25,13 @@ internal sealed class ValidationBehavior<TRequest, TResponse>(IEnumerable<IValid
 
         if (failures.Length > 0)
         {
-            throw new ValidationException(failures);
+            var errors = failures
+                .GroupBy(failure => failure.PropertyName)
+                .ToDictionary(
+                    group => group.Key,
+                    group => group.Select(failure => failure.ErrorMessage).Distinct().ToArray());
+
+            throw new SharedValidationException(errors);
         }
 
         return await next(cancellationToken);

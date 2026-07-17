@@ -2,5 +2,9 @@ namespace CarRental.SharedKernel.Domain;
 
 public abstract record DomainEvent : IDomainEvent
 {
-    public DateTimeOffset OccurredOnUtc { get; init; } = DateTimeOffset.UtcNow;
+    protected DomainEvent() : this(DateTimeOffset.UtcNow) { }
+
+    protected DomainEvent(DateTimeOffset occurredOnUtc) => OccurredOnUtc = occurredOnUtc;
+
+    public DateTimeOffset OccurredOnUtc { get; }
 }

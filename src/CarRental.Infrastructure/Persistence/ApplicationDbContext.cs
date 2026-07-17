@@ -1,4 +1,3 @@
-using CarRental.Application.Abstractions.Authentication;
 using CarRental.SharedKernel.Application;
 using CarRental.SharedKernel.Domain;
 using Microsoft.EntityFrameworkCore;
@@ -7,8 +6,8 @@ namespace CarRental.Infrastructure.Persistence;
 
 public sealed class ApplicationDbContext(
     DbContextOptions<ApplicationDbContext> options,
-    IClock clock,
-    ICurrentUser currentUser) : DbContext(options), IUnitOfWork
+    IDateTimeProvider dateTimeProvider,
+    ICurrentUserService currentUser) : DbContext(options), IUnitOfWork
 {
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -26,7 +25,7 @@ public sealed class ApplicationDbContext(
 
     private void ApplyAuditInformation()
     {
-        var now = clock.UtcNow;
+        var now = dateTimeProvider.UtcNow;
         var userId = currentUser.UserId;
 
         foreach (var entry in ChangeTracker.Entries<IAuditableEntity>())
@@ -51,7 +50,7 @@ public sealed class ApplicationDbContext(
         {
             entry.State = EntityState.Modified;
             entry.Entity.IsDeleted = true;
-            entry.Entity.DeletedAtUtc = clock.UtcNow;
+            entry.Entity.DeletedAtUtc = dateTimeProvider.UtcNow;
             entry.Entity.DeletedBy = currentUser.UserId;
         }
     }
