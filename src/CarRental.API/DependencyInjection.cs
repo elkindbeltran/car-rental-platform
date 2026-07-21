@@ -54,23 +54,33 @@ public static class DependencyInjection
         {
             var securityScheme = new OpenApiSecurityScheme
             {
-                Name = "Authorization",
-                Description = "Auth0 JWT Bearer token",
-                In = ParameterLocation.Header,
-                Type = SecuritySchemeType.Http,
-                Scheme = JwtBearerDefaults.AuthenticationScheme,
-                BearerFormat = "JWT",
+                Description = "Auth0 Authorization Code flow with PKCE",
+                Type = SecuritySchemeType.OAuth2,
+                Flows = new OpenApiOAuthFlows
+                {
+                    AuthorizationCode = new OpenApiOAuthFlow
+                    {
+                        AuthorizationUrl = new Uri(
+                            $"{new Uri(new Uri(auth0.Authority), "authorize")}?audience={Uri.EscapeDataString(auth0.Audience)}"),
+                        TokenUrl = new Uri(new Uri(auth0.Authority), "oauth/token"),
+                        Scopes = new Dictionary<string, string>
+                        {
+                            ["openid"] = "Authenticate the user",
+                            ["profile"] = "Read the user's basic profile"
+                        }
+                    }
+                },
                 Reference = new OpenApiReference
                 {
                     Type = ReferenceType.SecurityScheme,
-                    Id = JwtBearerDefaults.AuthenticationScheme
+                    Id = "oauth2"
                 }
             };
 
-            options.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, securityScheme);
+            options.AddSecurityDefinition("oauth2", securityScheme);
             options.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
-                [securityScheme] = Array.Empty<string>()
+                [securityScheme] = ["openid", "profile"]
             });
         });
 

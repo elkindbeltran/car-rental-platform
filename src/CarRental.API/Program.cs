@@ -35,7 +35,12 @@ try
     if (app.Environment.IsDevelopment())
     {
         app.UseSwagger();
-        app.UseSwaggerUI();
+        app.UseSwaggerUI(options =>
+        {
+            options.OAuthClientId(builder.Configuration["Auth0:ClientId"]);
+            options.OAuthUsePkce();
+            options.OAuthScopes("openid", "profile");
+        });
     }
 
     app.MapControllers();
