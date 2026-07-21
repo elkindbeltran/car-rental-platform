@@ -29,6 +29,7 @@ try
     app.UseExceptionHandler();
     app.UseSerilogRequestLogging();
     app.UseHttpsRedirection();
+    app.UseCors("Spa");
     app.UseAuthentication();
     app.UseAuthorization();
 

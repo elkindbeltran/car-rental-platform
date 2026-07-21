@@ -20,6 +20,12 @@ public static class DependencyInjection
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUserService, CurrentUser>();
 
+        var allowedOrigins = configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
+        services.AddCors(options => options.AddPolicy("Spa", policy =>
+            policy.WithOrigins(allowedOrigins)
+                .AllowAnyHeader()
+                .AllowAnyMethod()));
+
         services.AddOptions<Auth0Options>()
             .Bind(configuration.GetSection(Auth0Options.SectionName))
             .ValidateDataAnnotations()

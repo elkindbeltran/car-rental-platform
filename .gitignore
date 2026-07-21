@@ -9,3 +9,6 @@
 appsettings.Local.json
 local.settings.json
 TestResults/
+**/node_modules/
+**/.angular/
+**/dist/
