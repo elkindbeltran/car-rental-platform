@@ -25,6 +25,7 @@ export class ApiService {
     return this.http.get<Page<CustomerSummary>>(`${this.baseUrl}/customers`, { params });
   }
   customer(id: string) { return this.http.get<Customer>(`${this.baseUrl}/customers/${id}`); }
+  currentCustomer() { return this.http.get<Customer>(`${this.baseUrl}/customers/me`); }
   createCustomer(value: CustomerInput) { return this.http.post<Customer>(`${this.baseUrl}/customers`, value); }
   updateCustomer(id: string, value: CustomerInput) { return this.http.put<Customer>(`${this.baseUrl}/customers/${id}`, value); }
   deleteCustomer(id: string, rowVersion: string) { return this.http.delete<void>(`${this.baseUrl}/customers/${id}`, { headers: { 'If-Match': `\"${rowVersion}\"` } }); }

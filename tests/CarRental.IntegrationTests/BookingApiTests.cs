@@ -14,7 +14,7 @@ public sealed class BookingApiTests(CarRentalApiFactory factory) : IClassFixture
         using var administrator = factory.CreateAuthenticatedClient(administrator: true);
         var customer = await CreateCustomerAsync(administrator);
         var vehicle = await CreateVehicleAsync(administrator);
-        using var user = factory.CreateAuthenticatedClient();
+        using var user = factory.CreateAuthenticatedClient(administrator: true);
 
         var response = await user.PostAsJsonAsync("/api/bookings", BookingRequest(customer.Id, vehicle.Id));
         var booking = await response.Content.ReadFromJsonAsync<BookingResponse>();
@@ -32,7 +32,7 @@ public sealed class BookingApiTests(CarRentalApiFactory factory) : IClassFixture
         using var administrator = factory.CreateAuthenticatedClient(administrator: true);
         var customer = await CreateCustomerAsync(administrator);
         var vehicle = await CreateVehicleAsync(administrator);
-        using var user = factory.CreateAuthenticatedClient();
+        using var user = factory.CreateAuthenticatedClient(administrator: true);
         var request = BookingRequest(customer.Id, vehicle.Id);
 
         var firstResponse = await user.PostAsJsonAsync("/api/bookings", request);
@@ -47,11 +47,38 @@ public sealed class BookingApiTests(CarRentalApiFactory factory) : IClassFixture
     {
         using var administrator = factory.CreateAuthenticatedClient(administrator: true);
         var vehicle = await CreateVehicleAsync(administrator);
-        using var user = factory.CreateAuthenticatedClient();
+        using var user = factory.CreateAuthenticatedClient(administrator: true);
 
         var response = await user.PostAsJsonAsync("/api/bookings", BookingRequest(Guid.NewGuid(), vehicle.Id));
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Member_CanCreateBooking_ForOwnProvisionedCustomer()
+    {
+        using var administrator = factory.CreateAuthenticatedClient(administrator: true);
+        var vehicle = await CreateVehicleAsync(administrator);
+        using var member = factory.CreateAuthenticatedClient(email: $"member-{Guid.NewGuid():N}@example.com");
+        var customer = await member.GetFromJsonAsync<CustomerResponse>("/api/customers/me");
+
+        var response = await member.PostAsJsonAsync("/api/bookings", BookingRequest(customer!.Id, vehicle.Id));
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Member_CannotCreateBooking_ForAnotherCustomer()
+    {
+        using var administrator = factory.CreateAuthenticatedClient(administrator: true);
+        var customer = await CreateCustomerAsync(administrator);
+        var vehicle = await CreateVehicleAsync(administrator);
+        using var member = factory.CreateAuthenticatedClient(email: $"member-{Guid.NewGuid():N}@example.com");
+        await member.GetAsync("/api/customers/me");
+
+        var response = await member.PostAsJsonAsync("/api/bookings", BookingRequest(customer.Id, vehicle.Id));
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
 
     private static object BookingRequest(Guid customerId, Guid vehicleId) => new

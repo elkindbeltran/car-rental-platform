@@ -15,13 +15,26 @@ internal sealed class CreateBookingCommandHandler(
     IUnitOfWork unitOfWork,
     IDateTimeProvider dateTimeProvider,
     IIntegrationEventPublisher eventPublisher,
+    ICurrentUserService currentUser,
     IMapper mapper) : ICommandHandler<CreateBookingCommand, Result<BookingResponse>>
 {
     public async Task<Result<BookingResponse>> Handle(
         CreateBookingCommand request,
         CancellationToken cancellationToken)
     {
-        if (!await customerReader.ExistsAsync(request.CustomerId, cancellationToken))
+        var customerId = request.CustomerId;
+        if (!currentUser.IsInRole("Administrator"))
+        {
+            var ownedCustomerId = string.IsNullOrWhiteSpace(currentUser.UserId)
+                ? null
+                : await customerReader.GetIdByExternalUserIdAsync(currentUser.UserId, cancellationToken);
+            if (!ownedCustomerId.HasValue || ownedCustomerId.Value != customerId)
+            {
+                return Result.Failure<BookingResponse>(BookingErrors.CustomerForbidden);
+            }
+        }
+
+        if (!await customerReader.ExistsAsync(customerId, cancellationToken))
         {
             return Result.Failure<BookingResponse>(BookingErrors.CustomerNotFound);
         }
@@ -45,7 +58,7 @@ internal sealed class CreateBookingCommandHandler(
         var occurredOnUtc = dateTimeProvider.UtcNow;
         var booking = Domain.Booking.Booking.Create(
             Guid.NewGuid(),
-            request.CustomerId,
+            customerId,
             request.VehicleId,
             request.PickupAtUtc,
             request.ReturnAtUtc,

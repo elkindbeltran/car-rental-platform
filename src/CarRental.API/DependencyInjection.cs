@@ -73,6 +73,7 @@ public static class DependencyInjection
                         {
                             ["openid"] = "Authenticate the user",
                             ["profile"] = "Read the user's basic profile"
+                            , ["email"] = "Read the user's email address"
                         }
                     }
                 },
@@ -86,7 +87,7 @@ public static class DependencyInjection
             options.AddSecurityDefinition("oauth2", securityScheme);
             options.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
-                [securityScheme] = ["openid", "profile"]
+                [securityScheme] = ["openid", "profile", "email"]
             });
         });
 

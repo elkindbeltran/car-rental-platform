@@ -9,6 +9,7 @@ public sealed class Customer : AggregateRoot<Guid>, IAuditableEntity, IConcurren
     public const int MaximumNameLength = 100;
     public const int MaximumEmailLength = 256;
     public const int MaximumPhoneLength = 32;
+    public const int MaximumExternalUserIdLength = 256;
 
     private Customer(Guid id, string firstName, string lastName, string email, string? phone) : base(id)
     {
@@ -22,6 +23,7 @@ public sealed class Customer : AggregateRoot<Guid>, IAuditableEntity, IConcurren
     public string LastName { get; private set; } = string.Empty;
     public string Email { get; private set; } = string.Empty;
     public string? Phone { get; private set; }
+    public string? ExternalUserId { get; private set; }
     public bool IsActive { get; private set; }
     public DateTimeOffset CreatedAtUtc { get; set; }
     public string? CreatedBy { get; set; }
@@ -46,6 +48,22 @@ public sealed class Customer : AggregateRoot<Guid>, IAuditableEntity, IConcurren
         SetDetails(firstName, lastName, email, phone);
 
     public void Deactivate() => IsActive = false;
+
+    public void LinkToUser(string externalUserId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(externalUserId);
+        if (externalUserId.Trim().Length > MaximumExternalUserIdLength)
+        {
+            throw new BusinessException("Customer.InvalidExternalUserId", "The external user identifier is too long.");
+        }
+
+        if (ExternalUserId is not null && !string.Equals(ExternalUserId, externalUserId.Trim(), StringComparison.Ordinal))
+        {
+            throw new BusinessException("Customer.AlreadyLinked", "The customer is already linked to another user.");
+        }
+
+        ExternalUserId = externalUserId.Trim();
+    }
 
     private void SetDetails(string firstName, string lastName, string email, string? phone)
     {

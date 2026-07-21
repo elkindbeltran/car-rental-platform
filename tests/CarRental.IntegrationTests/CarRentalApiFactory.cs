@@ -57,10 +57,14 @@ public sealed class CarRentalApiFactory : WebApplicationFactory<Program>
         });
     }
 
-    public HttpClient CreateAuthenticatedClient(bool administrator = false)
+    public HttpClient CreateAuthenticatedClient(bool administrator = false, string? userId = null, string? email = null)
     {
         var client = CreateClient();
-        client.DefaultRequestHeaders.Add(TestAuthenticationHandler.UserHeader, Guid.NewGuid().ToString("N"));
+        client.DefaultRequestHeaders.Add(TestAuthenticationHandler.UserHeader, userId ?? Guid.NewGuid().ToString("N"));
+        if (email is not null)
+        {
+            client.DefaultRequestHeaders.Add(TestAuthenticationHandler.EmailHeader, email);
+        }
         if (administrator)
         {
             client.DefaultRequestHeaders.Add(TestAuthenticationHandler.RoleHeader, "Administrator");
@@ -84,6 +88,7 @@ internal sealed class TestAuthenticationHandler(
 {
     public const string UserHeader = "X-Test-User";
     public const string RoleHeader = "X-Test-Role";
+    public const string EmailHeader = "X-Test-Email";
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
@@ -93,6 +98,12 @@ internal sealed class TestAuthenticationHandler(
         }
 
         var claims = new List<Claim> { new(ClaimTypes.NameIdentifier, userId.ToString()) };
+        if (Request.Headers.TryGetValue(EmailHeader, out var email) && !string.IsNullOrWhiteSpace(email))
+        {
+            claims.Add(new Claim(ClaimTypes.Email, email.ToString()));
+            claims.Add(new Claim(ClaimTypes.GivenName, "Test"));
+            claims.Add(new Claim(ClaimTypes.Surname, "Member"));
+        }
         if (Request.Headers.TryGetValue(RoleHeader, out var role) && !string.IsNullOrWhiteSpace(role))
         {
             claims.Add(new Claim(ClaimTypes.Role, role.ToString()));

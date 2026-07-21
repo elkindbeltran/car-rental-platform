@@ -21,8 +21,21 @@ internal sealed class CustomerRepository(ApplicationDbContext dbContext)
         return dbContext.Customers.AnyAsync(x => x.Email == normalized && (!excludingCustomerId.HasValue || x.Id != excludingCustomerId.Value), cancellationToken);
     }
 
+    public Task<Domain.Customer.Customer?> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
+    {
+        var normalized = email.Trim().ToLowerInvariant();
+        return dbContext.Customers.SingleOrDefaultAsync(x => x.Email == normalized, cancellationToken);
+    }
+
+    public Task<Domain.Customer.Customer?> GetByExternalUserIdAsync(string externalUserId, CancellationToken cancellationToken = default) =>
+        dbContext.Customers.SingleOrDefaultAsync(x => x.ExternalUserId == externalUserId, cancellationToken);
+
     public Task<bool> ExistsAsync(Guid customerId, CancellationToken cancellationToken = default) =>
         dbContext.Customers.AnyAsync(x => x.Id == customerId && x.IsActive, cancellationToken);
+
+    public async Task<Guid?> GetIdByExternalUserIdAsync(string externalUserId, CancellationToken cancellationToken = default) =>
+        await dbContext.Customers.Where(x => x.ExternalUserId == externalUserId && x.IsActive)
+            .Select(x => (Guid?)x.Id).SingleOrDefaultAsync(cancellationToken);
 
     public void SetOriginalRowVersion(Domain.Customer.Customer customer, byte[] rowVersion) =>
         dbContext.Entry(customer).Property(x => x.RowVersion).OriginalValue = rowVersion;
