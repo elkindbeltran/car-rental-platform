@@ -34,6 +34,9 @@ public static class DependencyInjection
         var auth0 = configuration.GetRequiredSection(Auth0Options.SectionName).Get<Auth0Options>()
             ?? throw new InvalidOperationException("Auth0 configuration is missing.");
 
+        services.AddHttpClient<ICurrentUserProfileService, Auth0CurrentUserProfileService>(client =>
+            client.BaseAddress = new Uri(auth0.Authority.EndsWith('/') ? auth0.Authority : $"{auth0.Authority}/"));
+
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {

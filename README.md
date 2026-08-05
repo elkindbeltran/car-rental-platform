@@ -65,12 +65,10 @@ Open `http://localhost:4200`. Auth0 access tokens are attached only to the confi
 management actions. Change `src/environments/environment.ts` for a different API or Auth0 application, and add
 the deployed SPA origin to `Cors:AllowedOrigins` through deployment configuration.
 
-Member self-service booking also requires the access token to contain the user's email. Auth0 does not add
-profile fields to custom-API access tokens solely because the SPA requests the `email` scope. Add an Auth0
-post-login Action that copies `event.user.email`, `event.user.given_name`, and `event.user.family_name` to the
-namespaced claims `https://car-rental.example.com/email`, `https://car-rental.example.com/given_name`, and
-`https://car-rental.example.com/family_name`. The API links that authenticated `sub` to one customer profile;
-members can book only for that profile, while administrators can continue selecting any customer.
+For member self-service booking, the SPA requests the `email` scope. The API uses namespaced email/profile
+claims when available and otherwise securely resolves the profile from Auth0's `/userinfo` endpoint using the
+caller's bearer token. It then links that authenticated `sub` to one customer profile. Members can book only
+for that profile, while administrators can continue selecting any customer.
 
 Health endpoints are available at `/alive` (process liveness) and `/health` (dependency readiness). Swagger UI is enabled only in Development.
 

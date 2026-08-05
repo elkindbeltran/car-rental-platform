@@ -40,7 +40,7 @@ try
         {
             options.OAuthClientId(builder.Configuration["Auth0:ClientId"]);
             options.OAuthUsePkce();
-            options.OAuthScopes("openid", "profile");
+            options.OAuthScopes("openid", "profile", "email");
         });
     }
 

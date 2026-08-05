@@ -81,6 +81,18 @@ public sealed class BookingApiTests(CarRentalApiFactory factory) : IClassFixture
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
 
+    [Fact]
+    public async Task Member_WithoutEmailClaim_CanResolveProfileFromUserInfo()
+    {
+        using var member = factory.CreateAuthenticatedClient(userId: "userinfo-member");
+
+        var response = await member.GetAsync("/api/customers/me");
+        var customer = await response.Content.ReadFromJsonAsync<CustomerResponse>();
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal("userinfo-member@example.com", customer!.Email);
+    }
+
     private static object BookingRequest(Guid customerId, Guid vehicleId) => new
     {
         CustomerId = customerId,

@@ -1,5 +1,6 @@
 using CarRental.Application.Abstractions.Messaging;
 using CarRental.Infrastructure.Persistence;
+using CarRental.SharedKernel.Application;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -45,6 +46,8 @@ public sealed class CarRentalApiFactory : WebApplicationFactory<Program>
 
             services.RemoveAll<IIntegrationEventPublisher>();
             services.AddSingleton<IIntegrationEventPublisher, NoOpIntegrationEventPublisher>();
+            services.RemoveAll<ICurrentUserProfileService>();
+            services.AddSingleton<ICurrentUserProfileService, TestCurrentUserProfileService>();
             services.AddDataProtection().UseEphemeralDataProtectionProvider();
 
             services.AddAuthentication(options =>
@@ -77,6 +80,12 @@ public sealed class CarRentalApiFactory : WebApplicationFactory<Program>
     {
         public Task PublishAsync<TEvent>(TEvent integrationEvent, CancellationToken cancellationToken = default)
             where TEvent : IIntegrationEvent => Task.CompletedTask;
+    }
+
+    private sealed class TestCurrentUserProfileService : ICurrentUserProfileService
+    {
+        public Task<CurrentUserProfile?> GetAsync(CancellationToken cancellationToken = default) =>
+            Task.FromResult<CurrentUserProfile?>(new("userinfo-member@example.com", "Userinfo", "Member"));
     }
 }
 
