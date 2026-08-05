@@ -15,10 +15,12 @@ internal sealed class CustomerConfiguration : ConcurrencyConfiguration<CustomerE
         builder.Property(x => x.LastName).HasMaxLength(CustomerEntity.MaximumNameLength).IsRequired();
         builder.Property(x => x.Email).HasMaxLength(CustomerEntity.MaximumEmailLength).IsRequired();
         builder.Property(x => x.Phone).HasMaxLength(CustomerEntity.MaximumPhoneLength);
+        builder.Property(x => x.ExternalUserId).HasMaxLength(CustomerEntity.MaximumExternalUserIdLength);
         builder.Property(x => x.CreatedBy).HasMaxLength(256);
         builder.Property(x => x.LastModifiedBy).HasMaxLength(256);
         builder.Property(x => x.DeletedBy).HasMaxLength(256);
         builder.HasIndex(x => x.Email).IsUnique().HasFilter("[IsDeleted] = 0");
+        builder.HasIndex(x => x.ExternalUserId).IsUnique().HasFilter("[ExternalUserId] IS NOT NULL AND [IsDeleted] = 0");
         builder.HasQueryFilter(x => !x.IsDeleted);
         builder.Ignore(x => x.DomainEvents);
     }

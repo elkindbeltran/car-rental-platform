@@ -45,6 +45,31 @@ dotnet restore
 dotnet run --project src/CarRental.API
 ```
 
+### Angular SPA
+
+The responsive Angular client lives in `src/CarRental.Web` and uses Auth0 Authorization Code Flow with PKCE.
+The development configuration matches the API's checked-in Auth0 tenant, audience, and HTTPS launch URL.
+
+In Auth0, add `http://localhost:4200` to the SPA application's **Allowed Callback URLs**, **Allowed Logout
+URLs**, and **Allowed Web Origins**. Then run the API and web client in separate terminals:
+
+```powershell
+dotnet run --project src/CarRental.API --launch-profile https
+cd src/CarRental.Web
+npm install
+npm start
+```
+
+Open `http://localhost:4200`. Auth0 access tokens are attached only to the configured API origin. The custom
+`https://car-rental.example.com/roles` claim must include `Administrator` to display and use customer and fleet
+management actions. Change `src/environments/environment.ts` for a different API or Auth0 application, and add
+the deployed SPA origin to `Cors:AllowedOrigins` through deployment configuration.
+
+For member self-service booking, the SPA requests the `email` scope. The API uses namespaced email/profile
+claims when available and otherwise securely resolves the profile from Auth0's `/userinfo` endpoint using the
+caller's bearer token. It then links that authenticated `sub` to one customer profile. Members can book only
+for that profile, while administrators can continue selecting any customer.
+
 Health endpoints are available at `/alive` (process liveness) and `/health` (dependency readiness). Swagger UI is enabled only in Development.
 
 ## Core modules

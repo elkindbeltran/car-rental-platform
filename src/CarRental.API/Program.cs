@@ -1,4 +1,5 @@
 using CarRental.API;
+using CarRental.API.Controllers;
 using CarRental.API.ErrorHandling;
 using CarRental.Application;
 using CarRental.Infrastructure;
@@ -29,16 +30,23 @@ try
     app.UseExceptionHandler();
     app.UseSerilogRequestLogging();
     app.UseHttpsRedirection();
+    app.UseCors("Spa");
     app.UseAuthentication();
     app.UseAuthorization();
 
     if (app.Environment.IsDevelopment())
     {
         app.UseSwagger();
-        app.UseSwaggerUI();
+        app.UseSwaggerUI(options =>
+        {
+            options.OAuthClientId(builder.Configuration["Auth0:ClientId"]);
+            options.OAuthUsePkce();
+            options.OAuthScopes("openid", "profile", "email");
+        });
     }
 
     app.MapControllers();
+    app.MapCustomersEndpoints();
     app.MapHealthChecks("/health");
     app.MapHealthChecks("/alive", new() { Predicate = _ => false });
 

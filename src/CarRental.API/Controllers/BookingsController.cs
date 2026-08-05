@@ -41,6 +41,7 @@ public sealed class BookingsController(ISender sender) : ControllerBase
         {
             "Booking.CustomerNotFound" or "Booking.VehicleNotRentable" => StatusCodes.Status404NotFound,
             "Booking.VehicleUnavailable" => StatusCodes.Status409Conflict,
+            "Booking.CustomerForbidden" => StatusCodes.Status403Forbidden,
             _ => StatusCodes.Status422UnprocessableEntity
         };
 

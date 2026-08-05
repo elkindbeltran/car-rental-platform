@@ -4,6 +4,8 @@ namespace CarRental.Application.Booking.CreateBooking;
 
 internal static class BookingErrors
 {
+    public static ResultError CustomerForbidden { get; } = ResultError.Create(
+        "Booking.CustomerForbidden", "Members can only create bookings for their own customer profile.");
     public static readonly ResultError CustomerNotFound = ResultError.Create(
         "Booking.CustomerNotFound",
         "The selected customer does not exist.");

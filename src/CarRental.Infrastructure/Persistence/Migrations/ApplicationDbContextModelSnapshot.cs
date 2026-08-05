@@ -113,6 +113,10 @@ namespace CarRental.Infrastructure.Persistence.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<string>("ExternalUserId")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -151,6 +155,10 @@ namespace CarRental.Infrastructure.Persistence.Migrations
                     b.HasIndex("Email")
                         .IsUnique()
                         .HasFilter("[IsDeleted] = 0");
+
+                    b.HasIndex("ExternalUserId")
+                        .IsUnique()
+                        .HasFilter("[ExternalUserId] IS NOT NULL AND [IsDeleted] = 0");
 
                     b.ToTable("Customers", "customer");
                 });

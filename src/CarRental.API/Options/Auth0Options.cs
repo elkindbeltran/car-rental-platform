@@ -13,6 +13,9 @@ public sealed class Auth0Options
     public string Audience { get; init; } = string.Empty;
 
     [Required]
+    public string ClientId { get; init; } = string.Empty;
+
+    [Required]
     public string NameClaimType { get; init; } = "sub";
 
     [Required]
