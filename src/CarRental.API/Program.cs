@@ -1,4 +1,5 @@
 using CarRental.API;
+using CarRental.API.Controllers;
 using CarRental.API.ErrorHandling;
 using CarRental.Application;
 using CarRental.Infrastructure;
@@ -45,6 +46,7 @@ try
     }
 
     app.MapControllers();
+    app.MapCustomersEndpoints();
     app.MapHealthChecks("/health");
     app.MapHealthChecks("/alive", new() { Predicate = _ => false });
 
